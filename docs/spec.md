@@ -85,40 +85,38 @@ Text sketches of each layout. Redraw them in Figma, Excalidraw or on paper and s
 
 Mobile (360px): Records as cards
 [Skip to content]
-+--------------------------+
-| Finance Tracker   [Menu] |
-+--------------------------+
-| Search: [regex...] [Aa]  |
-| Sort: [Date v] [Asc/Desc]|
-| (status message)         |
-+--------------------------+
-| Lunch at cafeteria       |
-| Food - 2025-09-25        |
-| $12.50      [Edit][Del]  |
-+--------------------------+
-| Chemistry textbook  ...  |
-+--------------------------+
+ Finance Tracker   [Menu] 
+ Search: [regex...] [Aa]  
+ Sort: [Date v] [Asc/Desc]
+(status message)        
+
+ Lunch at cafeteria       
+ Food - 2025-09-25        
+ $12.50      [Edit][Del]  
+
+ Chemistry textbook 
+
 Desktop (1024px): Records as table
 [Skip to content]
-+--------------------------------------------------------------+
-| Finance Tracker | About | Dashboard | Records | Add | Settings |
-+--------------------------------------------------------------+
-| Search: [regex.............] [Aa]   Sort: [Date v] [Asc/Desc]  |
-| (status message: "12 matches")                                |
-+--------------------------------------------------------------+
-| Description        | Category | Date       | Amount | Actions  |
-| Lunch at cafeteria | Food     | 2025-09-25 | 12.50  | Edit Del |
-| Chemistry textbook | Books    | 2025-09-23 | 89.99  | Edit Del |
-+--------------------------------------------------------------+
+
+ Finance Tracker  About  Dashboard  Records  Add  Settings 
+
+ Search: [regex.............] [Aa]   Sort: [Date v] [Asc/Desc] 
+ (status message: "12 matches")                                
+
+ Description         Category  Date        Amount  Actions  
+ Lunch at cafeteria  Food      2025-09-25  12.50   Edit Del 
+ Chemistry textbook  Books     2025-09-23  89.99   Edit Del 
+
 Dashboard
-+----------+----------+----------+
-| Records  | Total    | Top      |
-|   24     | $410.20  | Food     |
-+----------+----------+----------+
-| Last 7 days:  ||  | ||| ||     |
-+--------------------------------+
-| Cap $500: $89.80 remaining     |   <- aria-live (polite / assertive)
-+--------------------------------+
+
+ Records   Total     Top      
+   24      $410.20   Food     
+
+ Last 7 days:  ||  | ||| ||     |
+
+ Cap $500: $89.80 remaining       <- aria-live (polite / assertive)
+
 Form and Settings
 Add transaction                 Settings
 Description [..............]    Base currency   [USD v]
