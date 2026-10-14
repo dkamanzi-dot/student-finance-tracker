@@ -1,246 +1,354 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Student Finance Tracker</title>
-  <link rel="stylesheet" href="styles/main.css">
-</head>
-<body>
-  <a class="skip-link" href="#main">Skip to content</a>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Student Finance Tracker</title>
+    <link rel="stylesheet" href="styles/main.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
 
-  <header class="site-header">
-    <h1>Student Finance Tracker</h1>
-    <nav aria-label="Main">
-      <ul class="nav-list">
-        <li><a href="#about">About</a></li>
-        <li><a href="#dashboard">Dashboard</a></li>
-        <li><a href="#records">Records</a></li>
-        <li><a href="#form">Add</a></li>
-        <li><a href="#settings">Settings</a></li>
-      </ul>
-    </nav>
-  </header>
+    <header class="site-header">
+      <h1>Student Finance Tracker</h1>
+      <nav aria-label="Main">
+        <ul class="nav-list">
+          <li><a href="#about">About</a></li>
+          <li><a href="#dashboard">Dashboard</a></li>
+          <li><a href="#records">Records</a></li>
+          <li><a href="#form">Add</a></li>
+          <li><a href="#settings">Settings</a></li>
+        </ul>
+      </nav>
+    </header>
 
-  <main id="main" tabindex="-1">
+    <main id="main" tabindex="-1">
+      <!-- ABOUT -->
+      <section id="about" aria-labelledby="about-title">
+        <h2 id="about-title">About</h2>
+        <p>
+          Track what you spend as a student, search your transactions with
+          regular expressions, and stay under a spending cap. Everything is
+          saved in your browser.
+        </p>
+        <p>Built by <strong>Kamanzi Daniel Kenny</strong>.</p>
+        <ul class="contact-list">
+          <li>
+            GitHub:
+            <a href="https://github.com/dkamanzi-dot"
+              >github.com/dkamanzi-dot</a
+            >
+          </li>
+          <li>
+            Email:
+            <a href="mailto:d.kamanzi@alustudent.com"
+              >d.kamanzi@alustudent.com</a
+            >
+          </li>
+        </ul>
+      </section>
 
-    <!-- ABOUT -->
-    <section id="about" aria-labelledby="about-title">
-      <h2 id="about-title">About</h2>
-      <p>Track what you spend as a student, search your transactions with regular expressions, and stay under a spending cap. Everything is saved in your browser.</p>
-      <p>Built by <strong>Your Name</strong>.</p>
-      <ul class="contact-list">
-        <li>GitHub: <a href="https://github.com/dkamanzi-dot">github.com/your-username</a></li>
-        <li>Email: <a href="d.kamanzi@alustudent">you@example.com</a></li>
-      </ul>
-    </section>
+      <!-- DASHBOARD -->
+      <section id="dashboard" aria-labelledby="dashboard-title">
+        <h2 id="dashboard-title">Dashboard</h2>
+        <p id="display-note" class="muted"></p>
 
-    <!-- DASHBOARD -->
-    <section id="dashboard" aria-labelledby="dashboard-title">
-      <h2 id="dashboard-title">Dashboard</h2>
-
-      <div class="stats">
-        <div class="stat">
-          <h3>Records</h3>
-          <p class="stat-value" id="stat-count">3</p>
-        </div>
-        <div class="stat">
-          <h3>Total spent</h3>
-          <p class="stat-value" id="stat-total">$147.49</p>
-        </div>
-        <div class="stat">
-          <h3>Top category</h3>
-          <p class="stat-value" id="stat-top">Books</p>
-        </div>
-      </div>
-
-      <h3>Last 7 days</h3>
-      <div class="chart" id="trend-chart" role="img" aria-label="Spending for the last 7 days">
-        <p class="muted">Chart appears here.</p>
-      </div>
-
-      <p id="cap-message" class="cap-message" role="status" aria-live="polite">Cap status appears here.</p>
-    </section>
-
-    <!-- RECORDS -->
-    <section id="records" aria-labelledby="records-title">
-      <h2 id="records-title">Records</h2>
-
-      <div class="toolbar">
-        <div class="field">
-          <label for="search-input">Search (regex)</label>
-          <input type="text" id="search-input" autocomplete="off" placeholder="e.g. coffee|tea">
-        </div>
-        <div class="field field-inline">
-          <input type="checkbox" id="search-case" checked>
-          <label for="search-case">Ignore case</label>
-        </div>
-        <div class="field">
-          <label for="sort-select">Sort by</label>
-          <select id="sort-select">
-            <option value="date-desc">Date, newest first</option>
-            <option value="date-asc">Date, oldest first</option>
-            <option value="description-asc">Description, A to Z</option>
-            <option value="description-desc">Description, Z to A</option>
-            <option value="amount-asc">Amount, low to high</option>
-            <option value="amount-desc">Amount, high to low</option>
-          </select>
-        </div>
-      </div>
-
-      <p id="search-status" class="muted" role="status">3 records</p>
-
-      <table class="records-table">
-        <caption class="visually-hidden">Transactions</caption>
-        <thead>
-          <tr>
-            <th scope="col">Description</th>
-            <th scope="col">Category</th>
-            <th scope="col">Date</th>
-            <th scope="col">Amount</th>
-            <th scope="col">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td data-label="Description">Lunch at cafeteria</td>
-            <td data-label="Category">Food</td>
-            <td data-label="Date">2025-09-25</td>
-            <td data-label="Amount">$12.50</td>
-            <td data-label="Actions" class="actions">
-              <button type="button" class="btn btn-small">Edit</button>
-              <button type="button" class="btn btn-small btn-danger">Delete</button>
-            </td>
-          </tr>
-          <tr>
-            <td data-label="Description">Chemistry textbook</td>
-            <td data-label="Category">Books</td>
-            <td data-label="Date">2025-09-23</td>
-            <td data-label="Amount">$89.99</td>
-            <td data-label="Actions" class="actions">
-              <button type="button" class="btn btn-small">Edit</button>
-              <button type="button" class="btn btn-small btn-danger">Delete</button>
-            </td>
-          </tr>
-          <tr>
-            <td data-label="Description">Bus pass</td>
-            <td data-label="Category">Transport</td>
-            <td data-label="Date">2025-09-20</td>
-            <td data-label="Amount">$45.00</td>
-            <td data-label="Actions" class="actions">
-              <button type="button" class="btn btn-small">Edit</button>
-              <button type="button" class="btn btn-small btn-danger">Delete</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <!-- ADD / EDIT FORM -->
-    <section id="form" aria-labelledby="form-title">
-      <h2 id="form-title">Add transaction</h2>
-
-      <form id="record-form" novalidate>
-        <div class="field">
-          <label for="description">Description</label>
-          <input type="text" id="description" name="description" aria-describedby="description-error" required>
-          <p class="error" id="description-error"></p>
+        <div class="stats">
+          <div class="stat">
+            <h3>Records</h3>
+            <p class="stat-value" id="stat-count">0</p>
+          </div>
+          <div class="stat">
+            <h3>Total spent</h3>
+            <p class="stat-value" id="stat-total">0</p>
+          </div>
+          <div class="stat">
+            <h3>Top category</h3>
+            <p class="stat-value" id="stat-top">None yet</p>
+          </div>
         </div>
 
-        <div class="field">
-          <label for="amount">Amount</label>
-          <input type="text" id="amount" name="amount" inputmode="decimal" aria-describedby="amount-error" required>
-          <p class="error" id="amount-error"></p>
+        <h3>Last 7 days</h3>
+        <div
+          class="chart"
+          id="trend-chart"
+          role="img"
+          aria-label="Spending for the last 7 days"
+        ></div>
+
+        <p
+          id="cap-message"
+          class="cap-message"
+          role="status"
+          aria-live="polite"
+        ></p>
+        <p
+          id="cap-alert"
+          class="cap-message over"
+          role="alert"
+          aria-live="assertive"
+        ></p>
+      </section>
+
+      <!-- RECORDS -->
+      <section id="records" aria-labelledby="records-title">
+        <h2 id="records-title">Records</h2>
+
+        <div class="toolbar">
+          <div class="field">
+            <label for="search-input">Search (regex)</label>
+            <input
+              type="text"
+              id="search-input"
+              autocomplete="off"
+              placeholder="e.g. coffee|tea"
+            />
+          </div>
+          <div class="field field-inline">
+            <input type="checkbox" id="search-case" checked />
+            <label for="search-case">Ignore case</label>
+          </div>
+          <div class="field">
+            <label for="sort-select">Sort by</label>
+            <select id="sort-select">
+              <option value="date-desc">Date, newest first</option>
+              <option value="date-asc">Date, oldest first</option>
+              <option value="description-asc">Description, A to Z</option>
+              <option value="description-desc">Description, Z to A</option>
+              <option value="amount-asc">Amount, low to high</option>
+              <option value="amount-desc">Amount, high to low</option>
+            </select>
+          </div>
         </div>
 
-        <div class="field">
-          <label for="category">Category</label>
-          <select id="category" name="category" aria-describedby="category-error" required>
-            <option value="">Choose a category</option>
-            <option>Food</option>
-            <option>Books</option>
-            <option>Transport</option>
-            <option>Entertainment</option>
-            <option>Fees</option>
-            <option>Other</option>
-          </select>
-          <p class="error" id="category-error"></p>
-        </div>
+        <p id="search-status" class="muted" role="status"></p>
 
-        <div class="field">
-          <label for="date">Date</label>
-          <input type="date" id="date" name="date" aria-describedby="date-error" required>
-          <p class="error" id="date-error"></p>
-        </div>
+        <table class="records-table">
+          <caption class="visually-hidden">
+            Transactions
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Description</th>
+              <th scope="col">Category</th>
+              <th scope="col">Date</th>
+              <th scope="col">Amount</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="records-body"></tbody>
+        </table>
+      </section>
 
-        <p id="form-status" class="form-status" role="status"></p>
+      <!-- ADD / EDIT FORM -->
+      <section id="form" aria-labelledby="form-title">
+        <h2 id="form-title">Add transaction</h2>
 
+        <form id="record-form" novalidate>
+          <div class="field">
+            <label for="description">Description</label>
+            <input
+              type="text"
+              id="description"
+              name="description"
+              aria-describedby="description-error"
+              required
+            />
+            <p class="error" id="description-error"></p>
+          </div>
+
+          <div class="field">
+            <label for="amount"
+              >Amount (<span id="amount-currency">USD</span>)</label
+            >
+            <input
+              type="text"
+              id="amount"
+              name="amount"
+              inputmode="decimal"
+              aria-describedby="amount-error"
+              required
+            />
+            <p class="error" id="amount-error"></p>
+          </div>
+
+          <div class="field">
+            <label for="category">Category</label>
+            <select
+              id="category"
+              name="category"
+              aria-describedby="category-error"
+              required
+            >
+              <option value="">Choose a category</option>
+            </select>
+            <p class="error" id="category-error"></p>
+          </div>
+
+          <div class="field">
+            <label for="date">Date</label>
+            <input
+              type="date"
+              id="date"
+              name="date"
+              aria-describedby="date-error"
+              required
+            />
+            <p class="error" id="date-error"></p>
+          </div>
+
+          <p id="form-status" class="form-status" role="status"></p>
+
+          <div class="form-actions">
+            <button type="submit" class="btn" id="save-btn">
+              Add transaction
+            </button>
+            <button type="button" class="btn btn-secondary" id="clear-btn">
+              Clear
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="settings" aria-labelledby="settings-title">
+        <h2 id="settings-title">Settings</h2>
+
+        <form id="settings-form" novalidate>
+          <fieldset>
+            <legend>Currency</legend>
+            <p class="hint">
+              Records are stored in the base currency. A rate means 1 base unit
+              equals that many units of the other currency.
+            </p>
+
+            <div class="field">
+              <label for="base-currency">Base currency</label>
+              <input
+                type="text"
+                id="base-currency"
+                maxlength="3"
+                autocomplete="off"
+                aria-describedby="base-currency-error"
+              />
+              <p class="error" id="base-currency-error"></p>
+            </div>
+
+            <div class="field-pair">
+              <div class="field">
+                <label for="cur2-code">Currency 2</label>
+                <input
+                  type="text"
+                  id="cur2-code"
+                  maxlength="3"
+                  autocomplete="off"
+                  aria-describedby="cur2-code-error"
+                />
+                <p class="error" id="cur2-code-error"></p>
+              </div>
+              <div class="field">
+                <label for="cur2-rate">Rate for currency 2</label>
+                <input
+                  type="text"
+                  id="cur2-rate"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  aria-describedby="cur2-rate-error"
+                />
+                <p class="error" id="cur2-rate-error"></p>
+              </div>
+            </div>
+
+            <div class="field-pair">
+              <div class="field">
+                <label for="cur3-code">Currency 3</label>
+                <input
+                  type="text"
+                  id="cur3-code"
+                  maxlength="3"
+                  autocomplete="off"
+                  aria-describedby="cur3-code-error"
+                />
+                <p class="error" id="cur3-code-error"></p>
+              </div>
+              <div class="field">
+                <label for="cur3-rate">Rate for currency 3</label>
+                <input
+                  type="text"
+                  id="cur3-rate"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  aria-describedby="cur3-rate-error"
+                />
+                <p class="error" id="cur3-rate-error"></p>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="display-currency">Show amounts in</label>
+              <select id="display-currency"></select>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Spending cap</legend>
+            <div class="field">
+              <label for="cap-input"
+                >Cap (in base currency, 0 for no cap)</label
+              >
+              <input
+                type="text"
+                id="cap-input"
+                inputmode="decimal"
+                autocomplete="off"
+                aria-describedby="cap-input-error"
+              />
+              <p class="error" id="cap-input-error"></p>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Categories</legend>
+            <div class="field">
+              <label for="categories-input"
+                >Categories, separated by commas</label
+              >
+              <input
+                type="text"
+                id="categories-input"
+                autocomplete="off"
+                aria-describedby="categories-input-error"
+              />
+              <p class="error" id="categories-input-error"></p>
+            </div>
+          </fieldset>
+
+          <p id="settings-status" class="form-status" role="status"></p>
+
+          <div class="form-actions">
+            <button type="submit" class="btn">Save settings</button>
+          </div>
+        </form>
+
+        <h3>Backup</h3>
         <div class="form-actions">
-          <button type="submit" class="btn">Save transaction</button>
-          <button type="button" class="btn btn-secondary" id="cancel-edit">Cancel</button>
+          <button type="button" class="btn btn-secondary" id="export-btn">
+            Export JSON
+          </button>
+          <button type="button" class="btn btn-secondary" id="reset-btn">
+            Reset to sample data
+          </button>
         </div>
-      </form>
-    </section>
-
-    <!-- SETTINGS -->
-    <section id="settings" aria-labelledby="settings-title">
-      <h2 id="settings-title">Settings</h2>
-
-      <form id="settings-form" novalidate>
-        <fieldset>
-          <legend>Currency</legend>
-          <div class="field">
-            <label for="base-currency">Base currency</label>
-            <input type="text" id="base-currency" value="USD">
-          </div>
-          <div class="field">
-            <label for="rate-eur">Rate for EUR (1 base = ? EUR)</label>
-            <input type="text" id="rate-eur" inputmode="decimal" value="0.92">
-          </div>
-          <div class="field">
-            <label for="rate-rwf">Rate for RWF (1 base = ? RWF)</label>
-            <input type="text" id="rate-rwf" inputmode="decimal" value="1450">
-          </div>
-        </fieldset>
-
-        <fieldset>
-          <legend>Spending cap</legend>
-          <div class="field">
-            <label for="cap-input">Cap (in base currency)</label>
-            <input type="text" id="cap-input" inputmode="decimal" value="500">
-          </div>
-        </fieldset>
-
-        <fieldset>
-          <legend>Categories</legend>
-          <div class="field">
-            <label for="categories-input">Categories, separated by commas</label>
-            <input type="text" id="categories-input" value="Food, Books, Transport, Entertainment, Fees, Other">
-          </div>
-        </fieldset>
-
-        <div class="form-actions">
-          <button type="submit" class="btn">Save settings</button>
+        <div class="field">
+          <label for="import-file">Import JSON file</label>
+          <input type="file" id="import-file" accept="application/json,.json" />
         </div>
-      </form>
+        <p id="data-status" class="form-status" role="status"></p>
+      </section>
+    </main>
 
-      <h3>Backup</h3>
-      <div class="form-actions">
-        <button type="button" class="btn btn-secondary" id="export-btn">Export JSON</button>
-      </div>
-      <div class="field">
-        <label for="import-file">Import JSON file</label>
-        <input type="file" id="import-file" accept="application/json,.json">
-      </div>
-      <p id="data-status" class="form-status" role="status"></p>
-    </section>
+    <footer class="site-footer">
+      <p>Student Finance Tracker. Data stays in your browser.</p>
+    </footer>
 
-  </main>
-
-  <footer class="site-footer">
-    <p>Student Finance Tracker. Data stays in your browser.</p>
-  </footer>
-
-  <script type="module" src="scripts/ui.js"></script>
-</body>
+    <script type="module" src="scripts/ui.js"></script>
+  </body>
 </html>

@@ -1,0 +1,128 @@
+[
+  {
+    "id": "txn_0001",
+    "description": "Lunch at cafeteria",
+    "amount": 12.5,
+    "category": "Food",
+    "date": "2025-09-25",
+    "createdAt": "2025-09-25T12:00:00.000Z",
+    "updatedAt": "2025-09-25T12:00:00.000Z"
+  },
+  {
+    "id": "txn_0002",
+    "description": "Chemistry textbook",
+    "amount": 89.99,
+    "category": "Books",
+    "date": "2025-09-23",
+    "createdAt": "2025-09-23T12:00:00.000Z",
+    "updatedAt": "2025-09-23T12:00:00.000Z"
+  },
+  {
+    "id": "txn_0003",
+    "description": "Bus pass",
+    "amount": 45.0,
+    "category": "Transport",
+    "date": "2025-09-20",
+    "createdAt": "2025-09-20T12:00:00.000Z",
+    "updatedAt": "2025-09-20T12:00:00.000Z"
+  },
+  {
+    "id": "txn_0004",
+    "description": "Coffee with friends",
+    "amount": 8.75,
+    "category": "Entertainment",
+    "date": "2025-09-28",
+    "createdAt": "2025-09-28T12:00:00.000Z",
+    "updatedAt": "2025-09-28T12:00:00.000Z"
+  },
+  {
+    "id": "txn_0005",
+    "description": "Coffee coffee run",
+    "amount": 3.5,
+    "category": "Food",
+    "date": "2026-10-09",
+    "createdAt": "2026-10-09T12:00:00.000Z",
+    "updatedAt": "2026-10-09T12:00:00.000Z"
+  },
+  {
+    "id": "txn_0006",
+    "description": "Leap day pizza",
+    "amount": 15,
+    "category": "Food",
+    "date": "2024-02-29",
+    "createdAt": "2024-02-29T12:00:00.000Z",
+    "updatedAt": "2024-02-29T12:00:00.000Z"
+  },
+  {
+    "id": "txn_0007",
+    "description": "Late tuition fee",
+    "amount": 250,
+    "category": "Fees",
+    "date": "2025-01-01",
+    "createdAt": "2025-01-01T12:00:00.000Z",
+    "updatedAt": "2025-01-01T12:00:00.000Z"
+  },
+  {
+    "id": "txn_0008",
+    "description": "Used laptop",
+    "amount": 1299.99,
+    "category": "Other",
+    "date": "2025-12-31",
+    "createdAt": "2025-12-31T12:00:00.000Z",
+    "updatedAt": "2025-12-31T12:00:00.000Z"
+  },
+  {
+    "id": "txn_0009",
+    "description": "Gum",
+    "amount": 0.01,
+    "category": "Food",
+    "date": "2026-10-10",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "updatedAt": "2026-10-10T12:00:00.000Z"
+  },
+  {
+    "id": "txn_0010",
+    "description": "Free workshop",
+    "amount": 0,
+    "category": "Entertainment",
+    "date": "2026-10-08",
+    "createdAt": "2026-10-08T12:00:00.000Z",
+    "updatedAt": "2026-10-08T12:00:00.000Z"
+  },
+  {
+    "id": "txn_0011",
+    "description": "<b>Bold</b> notebooks",
+    "amount": 6.25,
+    "category": "Books",
+    "date": "2026-10-07",
+    "createdAt": "2026-10-07T12:00:00.000Z",
+    "updatedAt": "2026-10-07T12:00:00.000Z"
+  },
+  {
+    "id": "txn_0012",
+    "description": "Cafe au lait with extra cream and a very long description to test wrapping on small screens",
+    "amount": 4.2,
+    "category": "Food",
+    "date": "2026-10-06",
+    "createdAt": "2026-10-06T12:00:00.000Z",
+    "updatedAt": "2026-10-06T12:00:00.000Z"
+  },
+  {
+    "id": "txn_0013",
+    "description": "Train ticket home",
+    "amount": 120,
+    "category": "Transport",
+    "date": "2026-10-05",
+    "createdAt": "2026-10-05T12:00:00.000Z",
+    "updatedAt": "2026-10-05T12:00:00.000Z"
+  },
+  {
+    "id": "txn_0014",
+    "description": "Study abroad deposit",
+    "amount": 99999.99,
+    "category": "Fees",
+    "date": "2025-11-15",
+    "createdAt": "2025-11-15T12:00:00.000Z",
+    "updatedAt": "2025-11-15T12:00:00.000Z"
+  }
+]

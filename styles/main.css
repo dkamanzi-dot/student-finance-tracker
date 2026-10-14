@@ -304,6 +304,7 @@ legend {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
+  --chart-h: 6rem;
 }
 
 .cap-message {
@@ -317,6 +318,34 @@ legend {
   color: var(--error);
   border-left-color: var(--error);
 }
+
+.chart { --chart-h: 6rem; }
+
+.bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1)
+  min-width: 0;
+}
+
+.bar {
+  width: 100%;
+  max-width: 2.5rem;
+  height: calc(var(--chart-h) * var(--ratio, 0));
+  min-height: 2px;
+  background: var(--primary);
+  border-radius: var(--radius) var(--radius) 0 0;
+  transition: height 0.4s ease;
+}
+
+
+.bar-day { font-size: 0.8rem; color: var(--muted); }
+
+.bar-amount { display: none; font-size: 0.75rem; font-weight: 700; }
+
+.cap-message:empty { display: none; }
 
 /* ---------- Records toolbar and mark ---------- */
 .toolbar {
