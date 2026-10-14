@@ -1,128 +1,270 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Validator tests</title>
-  <style>
-    body { font-family: system-ui, sans-serif; max-width: 48rem; margin: 0 auto; padding: 1rem; line-height: 1.5; }
-    h1 { font-size: 1.5rem; }
-    h2 { font-size: 1.1rem; margin-top: 1.5rem; }
-    ul { list-style: none; padding: 0; }
-    li { padding: 0.25rem 0.5rem; margin-bottom: 2px; border-left: 4px solid; }
-    li.pass { color: #14532d; background: #ecfdf3; border-color: #15803d; }
-    li.fail { color: #7f1d1d; background: #fef2f2; border-color: #b00020; font-weight: 700; }
-    #summary { font-size: 1.15rem; font-weight: 700; }
-  </style>
-</head>
-<body>
-  <h1>Validator tests</h1>
-  <p id="summary" role="status">Running tests...</p>
-  <div id="output"></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Validator tests</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 48rem;
+        margin: 0 auto;
+        padding: 1rem;
+        line-height: 1.5;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+      h2 {
+        font-size: 1.1rem;
+        margin-top: 1.5rem;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+      li {
+        padding: 0.25rem 0.5rem;
+        margin-bottom: 2px;
+        border-left: 4px solid;
+      }
+      li.pass {
+        color: #14532d;
+        background: #ecfdf3;
+        border-color: #15803d;
+      }
+      li.fail {
+        color: #7f1d1d;
+        background: #fef2f2;
+        border-color: #b00020;
+        font-weight: 700;
+      }
+      #summary {
+        font-size: 1.15rem;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Validator tests</h1>
+    <p id="summary" role="status">Running tests...</p>
+    <div id="output"></div>
 
-  <script type="module">
-    import {
-      patterns,
-      normalizeDescription,
-      isRealDate,
-      validateDescription,
-      validateAmount,
-      validateDate,
-      validateCategory,
-      checkDuplicateWords,
-      validateRecord,
-    } from './scripts/validators.js';
+    <script type="module">
+      import {
+        patterns,
+        normalizeDescription,
+        isRealDate,
+        validateDescription,
+        validateAmount,
+        validateDate,
+        validateCategory,
+        checkDuplicateWords,
+        validateRecord,
+        totalAmount,
+        topCategory,
+        trendLastSevenDays,
+        capStatus,
+        capMessage,
+      } from "./scripts/validators.js";
 
-    /* ---------- Tiny test helpers ---------- */
-    let passed = 0;
-    let failed = 0;
-    let currentList = null;
+      /* ---------- Tiny test helpers ---------- */
+      let passed = 0;
+      let failed = 0;
+      let currentList = null;
 
-    function group(title) {
-      const h2 = document.createElement('h2');
-      h2.textContent = title;
-      currentList = document.createElement('ul');
-      document.querySelector('#output').append(h2, currentList);
-    }
+      function group(title) {
+        const h2 = document.createElement("h2");
+        h2.textContent = title;
+        currentList = document.createElement("ul");
+        document.querySelector("#output").append(h2, currentList);
+      }
 
-    function assert(name, condition) {
-      const li = document.createElement('li');
-      li.className = condition ? 'pass' : 'fail';
-      li.textContent = `${condition ? 'PASS' : 'FAIL'}: ${name}`;
-      currentList.append(li);
-      condition ? passed++ : failed++;
-    }
+      function assert(name, condition) {
+        const li = document.createElement("li");
+        li.className = condition ? "pass" : "fail";
+        li.textContent = `${condition ? "PASS" : "FAIL"}: ${name}`;
+        currentList.append(li);
+        condition ? passed++ : failed++;
+      }
 
-    /* ---------- Description ---------- */
-    group('Description (no leading or trailing spaces)');
-    assert('"Lunch at cafeteria" is valid', validateDescription('Lunch at cafeteria').valid);
-    assert('"A" (one character) is valid', validateDescription('A').valid);
-    assert('" Lunch" (leading space) is invalid', !validateDescription(' Lunch').valid);
-    assert('"Lunch " (trailing space) is invalid', !validateDescription('Lunch ').valid);
-    assert('"" (empty) is invalid', !validateDescription('').valid);
-    assert('Double spaces collapse to one', normalizeDescription('Bus   pass') === 'Bus pass');
-    assert('"Bus  pass" (double space inside) is valid after collapsing', validateDescription('Bus  pass').valid);
+      /* ---------- Description ---------- */
+      group("Description (no leading or trailing spaces)");
+      assert(
+        '"Lunch at cafeteria" is valid',
+        validateDescription("Lunch at cafeteria").valid,
+      );
+      assert('"A" (one character) is valid', validateDescription("A").valid);
+      assert(
+        '" Lunch" (leading space) is invalid',
+        !validateDescription(" Lunch").valid,
+      );
+      assert(
+        '"Lunch " (trailing space) is invalid',
+        !validateDescription("Lunch ").valid,
+      );
+      assert('"" (empty) is invalid', !validateDescription("").valid);
+      assert(
+        "Double spaces collapse to one",
+        normalizeDescription("Bus   pass") === "Bus pass",
+      );
+      assert(
+        '"Bus  pass" (double space inside) is valid after collapsing',
+        validateDescription("Bus  pass").valid,
+      );
 
-    /* ---------- Amount ---------- */
-    group('Amount');
-    assert('"12.50" is valid', validateAmount('12.50').valid);
-    assert('"0" is valid', validateAmount('0').valid);
-    assert('"89.99" is valid', validateAmount('89.99').valid);
-    assert('"1000000" (large) is valid', validateAmount('1000000').valid);
-    assert('"0.05" (small) is valid', validateAmount('0.05').valid);
-    assert('"012" (leading zero) is invalid', !validateAmount('012').valid);
-    assert('"12.345" (3 decimals) is invalid', !validateAmount('12.345').valid);
-    assert('"-5" (negative) is invalid', !validateAmount('-5').valid);
-    assert('"abc" is invalid', !validateAmount('abc').valid);
-    assert('"" (empty) is invalid', !validateAmount('').valid);
+      /* ---------- Amount ---------- */
+      group("Amount");
+      assert('"12.50" is valid', validateAmount("12.50").valid);
+      assert('"0" is valid', validateAmount("0").valid);
+      assert('"89.99" is valid', validateAmount("89.99").valid);
+      assert('"1000000" (large) is valid', validateAmount("1000000").valid);
+      assert('"0.05" (small) is valid', validateAmount("0.05").valid);
+      assert('"012" (leading zero) is invalid', !validateAmount("012").valid);
+      assert(
+        '"12.345" (3 decimals) is invalid',
+        !validateAmount("12.345").valid,
+      );
+      assert('"-5" (negative) is invalid', !validateAmount("-5").valid);
+      assert('"abc" is invalid', !validateAmount("abc").valid);
+      assert('"" (empty) is invalid', !validateAmount("").valid);
 
-    /* ---------- Date ---------- */
-    group('Date (YYYY-MM-DD)');
-    assert('"2025-09-29" is valid', validateDate('2025-09-29').valid);
-    assert('"2024-02-29" (leap day) is valid', validateDate('2024-02-29').valid);
-    assert('"2025-13-01" (month 13) is invalid', !validateDate('2025-13-01').valid);
-    assert('"2025-9-5" (no zero padding) is invalid', !validateDate('2025-9-5').valid);
-    assert('"29/09/2025" (wrong format) is invalid', !validateDate('29/09/2025').valid);
-    assert('"2025-02-30" (matches regex, not a real date) is invalid', !validateDate('2025-02-30').valid);
-    assert('isRealDate("2025-04-31") is false', isRealDate('2025-04-31') === false);
+      /* ---------- Date ---------- */
+      group("Date (YYYY-MM-DD)");
+      assert('"2025-09-29" is valid', validateDate("2025-09-29").valid);
+      assert(
+        '"2024-02-29" (leap day) is valid',
+        validateDate("2024-02-29").valid,
+      );
+      assert(
+        '"2025-13-01" (month 13) is invalid',
+        !validateDate("2025-13-01").valid,
+      );
+      assert(
+        '"2025-9-5" (no zero padding) is invalid',
+        !validateDate("2025-9-5").valid,
+      );
+      assert(
+        '"29/09/2025" (wrong format) is invalid',
+        !validateDate("29/09/2025").valid,
+      );
+      assert(
+        '"2025-02-30" (matches regex, not a real date) is invalid',
+        !validateDate("2025-02-30").valid,
+      );
+      assert(
+        'isRealDate("2025-04-31") is false',
+        isRealDate("2025-04-31") === false,
+      );
 
-    /* ---------- Category ---------- */
-    group('Category (letters, spaces, hyphens)');
-    assert('"Food" is valid', validateCategory('Food').valid);
-    assert('"Fast-food" is valid', validateCategory('Fast-food').valid);
-    assert('"Study Supplies" is valid', validateCategory('Study Supplies').valid);
-    assert('"Food2" (digit) is invalid', !validateCategory('Food2').valid);
-    assert('"-Food" (leading hyphen) is invalid', !validateCategory('-Food').valid);
-    assert('"Food--Bar" (double hyphen) is invalid', !validateCategory('Food--Bar').valid);
-    assert('"" (empty) is invalid', !validateCategory('').valid);
+      /* ---------- Category ---------- */
+      group("Category (letters, spaces, hyphens)");
+      assert('"Food" is valid', validateCategory("Food").valid);
+      assert('"Fast-food" is valid', validateCategory("Fast-food").valid);
+      assert(
+        '"Study Supplies" is valid',
+        validateCategory("Study Supplies").valid,
+      );
+      assert('"Food2" (digit) is invalid', !validateCategory("Food2").valid);
+      assert(
+        '"-Food" (leading hyphen) is invalid',
+        !validateCategory("-Food").valid,
+      );
+      assert(
+        '"Food--Bar" (double hyphen) is invalid',
+        !validateCategory("Food--Bar").valid,
+      );
+      assert('"" (empty) is invalid', !validateCategory("").valid);
 
-    /* ---------- Advanced: duplicate word ---------- */
-    group('Advanced: duplicate word (back-reference)');
-    assert('"coffee coffee" gives a warning', checkDuplicateWords('coffee coffee') !== null);
-    assert('"Coffee coffee" (different case) gives a warning', checkDuplicateWords('Coffee coffee') !== null);
-    assert('"Coffee with friends" gives no warning', checkDuplicateWords('Coffee with friends') === null);
-    assert('"the theory" gives no warning (not a full repeated word)', checkDuplicateWords('the theory') === null);
-    assert('Warning does not make the description invalid', validateDescription('coffee coffee').valid);
+      /* ---------- Advanced: duplicate word ---------- */
+      group("Advanced: duplicate word (back-reference)");
+      assert(
+        '"coffee coffee" gives a warning',
+        checkDuplicateWords("coffee coffee") !== null,
+      );
+      assert(
+        '"Coffee coffee" (different case) gives a warning',
+        checkDuplicateWords("Coffee coffee") !== null,
+      );
+      assert(
+        '"Coffee with friends" gives no warning',
+        checkDuplicateWords("Coffee with friends") === null,
+      );
+      assert(
+        '"the theory" gives no warning (not a full repeated word)',
+        checkDuplicateWords("the theory") === null,
+      );
+      assert(
+        "Warning does not make the description invalid",
+        validateDescription("coffee coffee").valid,
+      );
 
-    /* ---------- Whole record ---------- */
-    group('validateRecord');
-    const good = validateRecord({ description: 'Bus pass', amount: '45.00', category: 'Transport', date: '2025-09-20' });
-    assert('A good record is valid', good.valid);
-    const bad = validateRecord({ description: ' x', amount: '12.345', category: 'Food2', date: '2025-13-01' });
-    assert('A bad record is invalid', !bad.valid);
-    assert('A bad record reports all 4 errors', Object.keys(bad.errors).length === 4);
-    const dup = validateRecord({ description: 'tea tea', amount: '3', category: 'Food', date: '2025-09-20' });
-    assert('A duplicate-word record is valid but has a warning', dup.valid && !!dup.warnings.description);
+      /* ---------- Whole record ---------- */
+      group("validateRecord");
+      const good = validateRecord({
+        description: "Bus pass",
+        amount: "45.00",
+        category: "Transport",
+        date: "2025-09-20",
+      });
+      assert("A good record is valid", good.valid);
+      const bad = validateRecord({
+        description: " x",
+        amount: "12.345",
+        category: "Food2",
+        date: "2025-13-01",
+      });
+      assert("A bad record is invalid", !bad.valid);
+      assert(
+        "A bad record reports all 4 errors",
+        Object.keys(bad.errors).length === 4,
+      );
+      const dup = validateRecord({
+        description: "tea tea",
+        amount: "3",
+        category: "Food",
+        date: "2025-09-20",
+      });
+      assert(
+        "A duplicate-word record is valid but has a warning",
+        dup.valid && !!dup.warnings.description,
+      );
 
-    /* ---------- Raw patterns ---------- */
-    group('Raw patterns');
-    assert('patterns.amount matches "7.5"', patterns.amount.test('7.5'));
-    assert('patterns.date rejects "2025-00-10"', !patterns.date.test('2025-00-10'));
+      /* ---------- Raw patterns ---------- */
+      group("Raw patterns");
+      assert('patterns.amount matches "7.5"', patterns.amount.test("7.5"));
+      assert(
+        'patterns.date rejects "2025-00-10"',
+        !patterns.date.test("2025-00-10"),
+      );
 
-    /* ---------- Summary ---------- */
-    const summary = document.querySelector('#summary');
-    summary.textContent = `${passed} passed, ${failed} failed`;
-    summary.style.color = failed === 0 ? '#14532d' : '#b00020';
-  </script>
-</body>
+          /* ---------- Stats and cap ---------- */
+    group('Stats and cap');
+    const sample = [
+      { amount: 10, category: 'Food', date: '2026-10-11' },
+      { amount: 5.5, category: 'Books', date: '2026-10-10' },
+      { amount: 20, category: 'Food', date: '2025-01-01' },
+    ];
+    assert('totalAmount sums records', totalAmount(sample) === 35.5);
+    assert('totalAmount avoids float errors (0.1 + 0.2)', totalAmount([{ amount: 0.1 }, { amount: 0.2 }]) === 0.3);
+    assert('topCategory is Food', topCategory(sample).name === 'Food');
+    assert('topCategory of empty list is null', topCategory([]) === null);
+    assert('trend has 7 days', trendLastSevenDays(sample, new Date(2026, 9, 11)).length === 7);
+    assert('trend counts today', trendLastSevenDays(sample, new Date(2026, 9, 11))[6].total === 10);
+    assert('trend counts yesterday', trendLastSevenDays(sample, new Date(2026, 9, 11))[5].total === 5.5);
+    assert('trend ignores old records', trendLastSevenDays(sample, new Date(2026, 9, 11)).reduce((s, d) => s + d.total, 0) === 15.5);
+    assert('under cap', capStatus(100, 500).state === 'under');
+    assert('exactly at cap is not over', capStatus(500, 500).state === 'under');
+    assert('over cap', capStatus(550.5, 500).state === 'over');
+    assert('overage amount is 50.5', capStatus(550.5, 500).amount === 50.5);
+    assert('cap 0 means no cap', capStatus(100, 0).state === 'none');
+    assert('over message says "over"', capMessage(capStatus(600, 500), (n) => `$${n}`).includes('over'));
+    assert('under message says "remaining"', capMessage(capStatus(100, 500), (n) => `$${n}`).includes('remaining'));
+
+      /* ---------- Summary ---------- */
+      const summary = document.querySelector("#summary");
+      summary.textContent = `${passed} passed, ${failed} failed`;
+      summary.style.color = failed === 0 ? "#14532d" : "#b00020";
+    </script>
+  </body>
 </html>

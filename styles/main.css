@@ -314,6 +314,8 @@ legend {
   background: var(--surface);
 }
 
+
+
 .cap-message.over {
   color: var(--error);
   border-left-color: var(--error);
@@ -407,6 +409,7 @@ mark {
 
 /* ---------- Tablet: 768px ---------- */
 @media (min-width: 768px) {
+  .bar-amount { display: block;}
   h1 { font-size: 1.75rem; }
 
   .site-header {
@@ -499,6 +502,8 @@ mark {
   .chart {
     min-height: 11rem;
   }
+
+  .chart { --chart-h: 9rem; }
 }
 
 /* ---------- Reduced motion ---------- */
