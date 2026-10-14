@@ -207,6 +207,12 @@ legend {
   font-size: 0.9rem;
 }
 
+.hint {
+  margin: 0 0 var(--space-3);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .field-invalid input,
 .field-invalid select {
   border-color: var(--error);

@@ -7,23 +7,38 @@ import {
   checkDuplicateWords,
   validateRecord,
   normalizeDescription,
+  validateCurrencyCode,
+  validateRate,
+  validateCategoriesText,
+  validateImportData,
 } from './validators.js';
 
 
 import { compileRegex, recordMatches, highlightInto } from './search.js';
 import {
+  loadRecords,
+  loadSettings,
+  fetchseed,
+  exportjson,
+  clearStored,
+  DEFAULT_SETTINGS,
+} from './storage.js'
+import {
   setRecords,
+  initSettings,
   getRecords,
   getRecord,
   getSettings,
+  setSettings,
   addRecord,
   updateRecord,
   deleteRecord,
+  replaceAllRecords,
   sortRecords,
-  displayNumber,
-  currencySymbol,
-  formatMoney,
   getRate,
+  displayNumber,
+  formatMoney,
+  currencySymbol,
   totalAmount,
   topCategory,
   trendLastSevenDays,
@@ -56,9 +71,12 @@ const capAlert = document.querySelector('#cap-alert');      // role="alert", ass
 
 // Cap setting elements
 const settingsForm = document.querySelector('#settings-form');
-const capInput = document.querySelector('#cap-input');
-const capError = document.querySelector('#cap-input-error');
 const settingsStatus = document.querySelector('#settings-status');
+const displaySelect = document.querySelector('#display-currency');
+const exportBtn = document.querySelector('#export-btn');
+const importFile = document.querySelector('#import-file');
+const resetBtn = document.querySelector('#reset-btn');
+const dataStatus = document.querySelector('#data-status');
 
 const fieldNames = ['description', 'amount', 'category', 'date'];
 
@@ -599,50 +617,245 @@ function renderDashboard() {
   renderCap(total, settings);
 }
 
+/*  12. SETTINGS
+    Currency, rates, cap and categories.  */
 
-/*  12. CAP SETTING
-    For now "Save settings" only saves the cap.
-    Currency, rates and categories are added in a later milestone.  */
+// Field ids in page order
+const fieldIds = [
+  'base-currency',
+  'cur2-code',
+  'cur2-rate',
+  'cur3-code',
+  'cur3-rate',
+  'cap-input',
+  'categories-input',
+];
+
+/* --- settings field messages --- */
+function showFieldError(id, message) {
+  const input = document.querySelector(`#${id}`);
+  document.querySelector(`#${id}-error`).textContent = message;
+  input.setAttribute('aria-invalid', 'true');
+  input.closest('.field').classList.add('field-invalid');
+}
+
+function clearFieldError(id) {
+  const input = document.querySelector(`#${id}`);
+  document.querySelector(`#${id}-error`).textContent = '';
+  input.removeAttribute('aria-invalid');
+  input.closest('.field').classList.remove('field-invalid');
+}
+
+function valueOf(id) {
+  return document.querySelector(`#${id}`).value.trim();
+}
+
+
+/* --- fill the form from saved settings --- */
+function fillDisplaySelect(selected) {
+  displaySelect.replaceChildren();
+  getSettings().currencies.forEach((code) => {
+    const option = document.createElement('option');
+    option.value = code;
+    option.textContent = code;
+    displaySelect.append(option);
+  });
+  displaySelect.value = selected;
+}
+
+function fillSettingsForm() {
+  const s = getSettings();
+  const [base, c2, c3] = s.currencies;
+
+  document.querySelector('#base-currency').value = base;
+  document.querySelector('#cur2-code').value = c2;
+  document.querySelector('#cur2-rate').value = String(s.rates[c2]);
+  document.querySelector('#cur3-code').value = c3;
+  document.querySelector('#cur3-rate').value = String(s.rates[c3]);
+  document.querySelector('#cap-input').value = String(s.cap);
+  document.querySelector('#categories-input').value = s.categories.join(', ');
+
+  fillDisplaySelect(s.displayCurrency);
+  fieldIds.forEach(clearFieldError);
+}
+
+
+/* --- save settings --- */
 settingsForm.addEventListener('submit', (event) => {
   event.preventDefault();   // stop the page from reloading
 
-  const value = capInput.value.trim();
-  const result = validateAmount(value);   // same number rule as the amount field
+  const base = valueOf('base-currency').toUpperCase();
+  const c2 = valueOf('cur2-code').toUpperCase();
+  const c3 = valueOf('cur3-code').toUpperCase();
+  const categories = validateCategoriesText(valueOf('categories-input'));
 
-  if (!result.valid) {
-    capError.textContent = result.message;
-    capInput.setAttribute('aria-invalid', 'true');
-    capInput.closest('.field').classList.add('field-invalid');
-    settingsStatus.textContent = 'Fix the cap and save again.';
-    capInput.focus();
+  // [field id, result] in page order
+  const checks = [
+    ['base-currency', validateCurrencyCode(base)],
+    ['cur2-code', validateCurrencyCode(c2)],
+    ['cur2-rate', validateRate(valueOf('cur2-rate'))],
+    ['cur3-code', validateCurrencyCode(c3)],
+    ['cur3-rate', validateRate(valueOf('cur3-rate'))],
+    ['cap-input', validateAmount(valueOf('cap-input'))],
+    ['categories-input', categories],
+  ];
+
+  fieldIds.forEach(clearFieldError);
+
+  const errors = {};
+  checks.forEach(([id, result]) => {
+    if (!result.valid) errors[id] = result.message;
+  });
+
+  // The three codes must be different (only checked when each one is valid)
+  if (!errors['base-currency'] && !errors['cur2-code'] && !errors['cur3-code']) {
+    if (new Set([base, c2, c3]).size < 3) {
+      errors['cur3-code'] = 'The three currencies must be different.';
+    }
+  }
+
+  const failed = fieldIds.filter((id) => errors[id]);
+  if (failed.length > 0) {
+    failed.forEach((id) => showFieldError(id, errors[id]));
+    settingsStatus.textContent =
+      failed.length === 1
+        ? 'There is 1 error. Fix it and save again.'
+        : `There are ${failed.length} errors. Fix them and save again.`;
+    document.querySelector(`#${failed[0]}`).focus();
     return;
   }
 
-  // Valid: clear the error, save, update the dashboard
-  capError.textContent = '';
-  capInput.removeAttribute('aria-invalid');
-  capInput.closest('.field').classList.remove('field-invalid');
+  // Valid: save
+  const currencies = [base, c2, c3];
+  let display = displaySelect.value;
+  if (!currencies.includes(display)) display = base;
 
-  setSettings({ cap: Number(value) });
-  settingsStatus.textContent =
-    Number(value) === 0 ? 'Cap removed.' : `Cap saved: ${formatMoney(Number(value), getSettings())}.`;
-  renderDashboard();
+  setSettings({
+    baseCurrency: base,
+    currencies,
+    rates: { [c2]: Number(valueOf('cur2-rate')), [c3]: Number(valueOf('cur3-rate')) },
+    displayCurrency: display,
+    cap: Number(valueOf('cap-input')),
+    categories: categories.list,
+  });
+
+  fillSettingsForm();
+  settingsStatus.textContent = 'Settings saved.';
+  onSettingsChange();
 });
 
 
-/*  13. START THE APP */
+/* --- display currency (applies immediately) --- */
+displaySelect.addEventListener('change', () => {
+  setSettings({ displayCurrency: displaySelect.value });
+  settingsStatus.textContent = `Amounts are now shown in ${displaySelect.value}.`;
+  onSettingsChange();
+});
 
-async function init() {
+
+/*  13. BACKUP (EXPORT, IMPORT, RESET)  */
+
+/* --- export --- */
+exportBtn.addEventListener('click', () => {
+  const records = getRecords();
+  const text = exportJson(records, getSettings());
+
+  const blob = new Blob([text], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'finance-tracker-export.json';
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+
+  dataStatus.textContent = `Exported ${records.length} ${records.length === 1 ? 'record' : 'records'}.`;
+});
+
+
+/* --- import --- */
+function importFailed(message) {
+  dataStatus.textContent = message;
+  importFile.setAttribute('aria-invalid', 'true');
+  importFile.value = '';
+}
+
+importFile.addEventListener('change', async () => {
+  const file = importFile.files[0];
+  if (!file) return;
+  importFile.removeAttribute('aria-invalid');
+
+  // 1. Is it JSON at all?
+  let data;
   try {
-    const response = await fetch('seed.json');
-    setRecords(await response.json());
-  } catch (err) {
-    console.error('Could not load seed.json', err);
-    setRecords([]);
+    data = JSON.parse(await file.text());
+  } catch {
+    importFailed('Import failed. That file is not valid JSON.');
+    return;
   }
 
+  // 2. Is the structure right?
+  const result = validateImportData(data);
+  if (!result.valid) {
+    const shown = result.errors.slice(0, 3).join(' ');
+    const more = result.errors.length > 3 ? ` (and ${result.errors.length - 3} more problems)` : '';
+    importFailed(`Import failed. ${shown}${more}`);
+    return;
+  }
+
+  // 3. Ask before replacing the current records
+  const count = result.records.length;
+  const ok = confirm(
+    `Replace your ${getRecords().length} current records with ${count} imported records?`
+  );
+  if (!ok) {
+    dataStatus.textContent = 'Import cancelled.';
+    importFile.value = '';
+    return;
+  }
+
+  // 4. Load it
+  replaceAllRecords(result.records);
+  if (result.settings) setSettings(result.settings);
+  fillSettingsForm();
+  onSettingsChange();
+  dataStatus.textContent = `Imported ${count} ${count === 1 ? 'record' : 'records'}.`;
+  importFile.value = '';
+});
+
+
+/* --- reset to sample data --- */
+resetBtn.addEventListener('click', async () => {
+  if (!confirm('Replace all your records and settings with the sample data?')) return;
+
+  clearStored();
+  const seed = await fetchSeed();
+  replaceAllRecords(seed);
+  setSettings(structuredClone(DEFAULT_SETTINGS));
+  fillSettingsForm();
+  onSettingsChange();
+  dataStatus.textContent = `Sample data restored (${seed.length} records).`;
+});
+
+/*  14. START THE APP */
+function onSettingsChange() {
   refreshFormOptions();
-  capInput.value = String(getSettings().cap)
+  render();
+}
+
+async function init() {
+  initSettings(loadSettings());
+
+  const saved = loadRecords();
+  if (saved === null) {
+    replaceAllRecords(await fetchSeed());   // also saves them
+  } else {
+    setRecords(saved);
+  }
+
+  fillSettingsForm();
+  refreshFormOptions();
   render();
 }
 

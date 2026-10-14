@@ -1,17 +1,12 @@
+import { DEFAULT_SETTINGS, saveRecords, saveSettings } from './storage.js';
+
 /* 1. The Data */
 let records = [];
 let nextNumber = 1;
 
 
 /* Settings */
-let settings = {
-    baseCurrency: 'USD',
-    currencies: ['USD', 'EUR', 'RWF'],
-    rates: { EUR: 0.92, RWF: 1450},
-    displayCurrency: 'USD',
-    cap: 500,
-    categories: ['Food', 'Books', 'Transport', 'Entertainment', 'Fees', 'Other']
-};
+let settings = structuredClone(DEFAULT_SETTINGS)
 
 export function getSettings() {
     return settings;
@@ -19,6 +14,11 @@ export function getSettings() {
 
 export function setSettings(changes) {
     settings = { ...settings, ...changes };
+    saveSettings(settings);
+}
+
+export function initSettings(saved){
+  settings = saved;
 }
 
 
@@ -64,6 +64,7 @@ export function setRecords(list) {
             updatedAt: now,
         };
         records.push(record);
+        saveRecords(record);
         return record;
     }
 
@@ -76,12 +77,19 @@ export function setRecords(list) {
         record.category = changes.category;
         record.date = changes.date;
         record.updatedAt = new Date().toISOString();
+        saveRecords(records);
         return record;
         }
 
         export function deleteRecord(id) {
             records = records.filter((r) => r.id !== id);
+            saveRecords(records);
         }
+
+        export function replaceAllRecords(list) {
+        setRecords(list);
+        saveRecords(records);
+      }
 
 
         /*  5. Sort */
