@@ -6,7 +6,7 @@ export const patterns = {
     date:/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/,
     category: /^[A-Za-z]+(?:[ -][A-Za-z]+)*$/,
     duplicateWord: /\b(\w+)\s+\1\b/i,
-    currencycode: /^[A-Z]{3}$/,
+    currencyCode: /^[A-Z]{3}$/,
     rate: /^(?!0+(?:\.0+)?$)\d+(?:\.\d{1,6})?$/,
 };
 
@@ -86,7 +86,7 @@ export function validateDate(value) {
             return { valid: true };
             }
 
-  /*Duplicate word warning*/
+  /* Duplicate word warning */
 
   export function
   checkDuplicateWords(value) {
@@ -113,7 +113,7 @@ export function validateRecord(fields) {
     
     
     const warnings = {};
-    const dup = checkDuplicate(fields.description);
+    const dup = checkDuplicateWords(fields.description);
     if (dup) warnings.description = dup;
 
     return { valid: Object.keys(errors).length === 0, errors, warnings };
@@ -145,7 +145,6 @@ export function validateRate(value) {
   return { valid: true };
 }
 
-// Text like "Food, Books, Fast-food" -> { valid: true, list: [...] }
 export function validateCategoriesText(text) {
   const list = [];
   const seen = new Set();
@@ -174,11 +173,6 @@ export function validateCategoriesText(text) {
   return { valid: true, list };
 }
 
-/*  Stored data checks
-    Used when loading from localStorage and when importing JSON.
-    They return a list of problems. An empty list means the data is fine.  */
-
-// Checks one record object
 export function validateStoredRecord(record) {
   if (!record || typeof record !== 'object' || Array.isArray(record)) {
     return ['is not an object'];
@@ -214,7 +208,6 @@ export function validateStoredRecord(record) {
   return problems;
 }
 
-// Checks the settings object
 export function validateSettingsObject(settings) {
   if (!settings || typeof settings !== 'object' || Array.isArray(settings)) {
     return ['settings must be an object'];

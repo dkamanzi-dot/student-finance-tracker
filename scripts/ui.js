@@ -18,8 +18,8 @@ import { compileRegex, recordMatches, highlightInto } from './search.js';
 import {
   loadRecords,
   loadSettings,
-  fetchseed,
-  exportjson,
+  fetchSeed,
+  exportJson,
   clearStored,
   DEFAULT_SETTINGS,
 } from './storage.js'
@@ -66,8 +66,8 @@ const totalEl = document.querySelector('#stat-total');
 const topEl = document.querySelector('#stat-top');
 const chartEl = document.querySelector('#trend-chart');
 const noteEl = document.querySelector('#display-note');
-const capPolite = document.querySelector('#cap-message');   // role="status", polite
-const capAlert = document.querySelector('#cap-alert');      // role="alert", assertive
+const capPolite = document.querySelector('#cap-message');  
+const capAlert = document.querySelector('#cap-alert');      
 
 // Cap setting elements
 const settingsForm = document.querySelector('#settings-form');
@@ -181,8 +181,6 @@ fieldNames.forEach((name) => {
 
 /*  5. CATEGORY DROPDOWNS AND CURRENCY LABEL  */
 
-// Fills a <select> with the categories from Settings.
-// A category that is no longer in Settings but is used by a record is kept.
 function fillCategorySelect(select, selected, withPlaceholder) {
   const names = [...getSettings().categories];
   if (selected && !names.includes(selected)) names.push(selected);
@@ -206,7 +204,6 @@ function fillCategorySelect(select, selected, withPlaceholder) {
   select.value = selected || '';
 }
 
-// Keeps the Add form in step with Settings
 function refreshFormOptions() {
   const select = form.elements.category;
   fillCategorySelect(select, select.value, true);
@@ -240,7 +237,6 @@ function render(extraMessage = '') {
   }
   searchStatus.textContent = extraMessage + message;
 
-  // Mark the search box invalid when the pattern is broken
   if (error) searchInput.setAttribute('aria-invalid', 'true');
   else searchInput.removeAttribute('aria-invalid');
 
@@ -317,7 +313,6 @@ function buildRow(record, re, settings) {
 /*  7. INLINE EDIT
     The Edit button turns the row into inputs. Enter saves, Escape cancels.  */
 
-// A row made of inputs
 function buildEditRow(record, settings) {
   const tr = document.createElement('tr');
   tr.className = 'editing';
@@ -352,7 +347,6 @@ function buildEditRow(record, settings) {
     errorEl.className = 'error';
     errorEl.id = `edit-${name}-error`;
 
-    // Keep the draft up to date and check as the user types
     const onInput = () => {
       draft[name] = input.value;
       validateField(name, true);
@@ -360,7 +354,6 @@ function buildEditRow(record, settings) {
     input.addEventListener('input', onInput);
     input.addEventListener('change', onInput);
 
-    // Keyboard: Enter saves, Escape cancels
     input.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') {
         event.preventDefault();
@@ -454,13 +447,11 @@ form.addEventListener('submit', (event) => {
         ? 'There is 1 error. Fix it and save again.'
         : `There are ${errorCount} errors. Fix them and save again.`;
 
-    // Move keyboard focus to the first field with an error
     const firstBad = fieldNames.find((name) => errors[name]);
     form.elements[firstBad].focus();
     return;
   }
 
-  // Valid: build clean data (double spaces collapsed, amount as a number)
   const data = {
     description: normalizeDescription(fields.description),
     amount: Number(fields.amount),
@@ -482,8 +473,7 @@ clearBtn.addEventListener('click', () => {
 });
 
 
-/*  9. TABLE BUTTONS
-    One listener on the table body handles every button.  */
+/*  9. TABLE BUTTONS One listener on the table body handles every button.  */
 tbody.addEventListener('click', (event) => {
   const button = event.target.closest('button[data-action]');
   if (!button) return;
@@ -498,7 +488,6 @@ tbody.addEventListener('click', (event) => {
 
   if (action === 'delete') {
     if (confirm(`Delete "${record.description}"?`)) {
-      // If you delete the row you are editing, stop editing
       if (editingId === record.id) {
         editingId = null;
         draft = null;
@@ -515,13 +504,11 @@ searchInput.addEventListener('input', () => render());
 caseBox.addEventListener('change', () => render());
 sortSelect.addEventListener('change', () => render());
 
-/*  11. DASHBOARD
-    Stat boxes, 7-day chart and the cap message.  */
+/*  11. DASHBOARD Stat boxes, 7-day chart and the cap message.  */
 
-// Remember the last chart so it only redraws when the data changes
 let lastChartKey = '';
 
-/* --- stat boxes --- */
+/*  stat boxes  */
 function renderStats(records, total, settings) {
   countEl.textContent = records.length;
   totalEl.textContent = formatMoney(total, settings);
@@ -536,11 +523,10 @@ function renderStats(records, total, settings) {
 }
 
 
-/* --- 7-day chart --- */
+/*  7-day chart  */
 function renderChart(records, settings) {
   const trend = trendLastSevenDays(records);
 
-  // Skip the redraw if nothing changed (keeps the animation calm)
   const key = JSON.stringify({
     trend,
     code: settings.displayCurrency,
@@ -549,7 +535,6 @@ function renderChart(records, settings) {
   if (key === lastChartKey) return;
   lastChartKey = key;
 
-  // The chart is role="img", so the numbers go in its label for screen readers
   const summary = trend.map((d) => `${d.label} ${formatMoney(d.total, settings)}`).join(', ');
   chartEl.setAttribute('aria-label', `Spending for the last 7 days: ${summary}.`);
 
@@ -567,7 +552,7 @@ function renderChart(records, settings) {
 
     const bar = document.createElement('div');
     bar.className = 'bar';
-    bar.style.setProperty('--ratio', '0');   // start empty, then grow
+    bar.style.setProperty('--ratio', '0');
 
     const label = document.createElement('span');
     label.className = 'bar-day';
@@ -576,18 +561,13 @@ function renderChart(records, settings) {
     col.append(amount, bar, label);
     chartEl.append(col);
 
-    // Next frame: set the real height so the bar animates up
     const ratio = max > 0 ? day.total / max : 0;
     requestAnimationFrame(() => bar.style.setProperty('--ratio', String(ratio)));
   });
 }
 
 
-/* --- cap message ---
-   Under the cap  -> polite region (waits for the user to pause)
-   Over the cap   -> assertive region (interrupts right away)
-   Text is only changed when it is different, so screen readers
-   are not spammed with repeats. */
+/*  cap message  */
 function setText(element, text) {
   if (element.textContent !== text) element.textContent = text;
 }
@@ -606,7 +586,7 @@ function renderCap(total, settings) {
 }
 
 
-/* --- draw the whole dashboard --- */
+/*  draw the whole dashboard  */
 function renderDashboard() {
   const records = getRecords();
   const settings = getSettings();
@@ -617,10 +597,8 @@ function renderDashboard() {
   renderCap(total, settings);
 }
 
-/*  12. SETTINGS
-    Currency, rates, cap and categories.  */
+/*  12. SETTINGS Currency, rates, cap and categories.  */
 
-// Field ids in page order
 const fieldIds = [
   'base-currency',
   'cur2-code',
@@ -631,7 +609,7 @@ const fieldIds = [
   'categories-input',
 ];
 
-/* --- settings field messages --- */
+/*  settings field messages  */
 function showFieldError(id, message) {
   const input = document.querySelector(`#${id}`);
   document.querySelector(`#${id}-error`).textContent = message;
@@ -651,7 +629,7 @@ function valueOf(id) {
 }
 
 
-/* --- fill the form from saved settings --- */
+/*  fill the form from saved settings  */
 function fillDisplaySelect(selected) {
   displaySelect.replaceChildren();
   getSettings().currencies.forEach((code) => {
@@ -680,16 +658,15 @@ function fillSettingsForm() {
 }
 
 
-/* --- save settings --- */
+/*  save settings  */
 settingsForm.addEventListener('submit', (event) => {
-  event.preventDefault();   // stop the page from reloading
+  event.preventDefault();
 
   const base = valueOf('base-currency').toUpperCase();
   const c2 = valueOf('cur2-code').toUpperCase();
   const c3 = valueOf('cur3-code').toUpperCase();
   const categories = validateCategoriesText(valueOf('categories-input'));
 
-  // [field id, result] in page order
   const checks = [
     ['base-currency', validateCurrencyCode(base)],
     ['cur2-code', validateCurrencyCode(c2)],
@@ -707,7 +684,6 @@ settingsForm.addEventListener('submit', (event) => {
     if (!result.valid) errors[id] = result.message;
   });
 
-  // The three codes must be different (only checked when each one is valid)
   if (!errors['base-currency'] && !errors['cur2-code'] && !errors['cur3-code']) {
     if (new Set([base, c2, c3]).size < 3) {
       errors['cur3-code'] = 'The three currencies must be different.';
@@ -725,7 +701,6 @@ settingsForm.addEventListener('submit', (event) => {
     return;
   }
 
-  // Valid: save
   const currencies = [base, c2, c3];
   let display = displaySelect.value;
   if (!currencies.includes(display)) display = base;
@@ -745,7 +720,7 @@ settingsForm.addEventListener('submit', (event) => {
 });
 
 
-/* --- display currency (applies immediately) --- */
+/*  display currency (applies immediately)  */
 displaySelect.addEventListener('change', () => {
   setSettings({ displayCurrency: displaySelect.value });
   settingsStatus.textContent = `Amounts are now shown in ${displaySelect.value}.`;
@@ -755,7 +730,7 @@ displaySelect.addEventListener('change', () => {
 
 /*  13. BACKUP (EXPORT, IMPORT, RESET)  */
 
-/* --- export --- */
+/*  export  */
 exportBtn.addEventListener('click', () => {
   const records = getRecords();
   const text = exportJson(records, getSettings());
@@ -774,7 +749,7 @@ exportBtn.addEventListener('click', () => {
 });
 
 
-/* --- import --- */
+/*  import  */
 function importFailed(message) {
   dataStatus.textContent = message;
   importFile.setAttribute('aria-invalid', 'true');
@@ -786,7 +761,6 @@ importFile.addEventListener('change', async () => {
   if (!file) return;
   importFile.removeAttribute('aria-invalid');
 
-  // 1. Is it JSON at all?
   let data;
   try {
     data = JSON.parse(await file.text());
@@ -795,7 +769,6 @@ importFile.addEventListener('change', async () => {
     return;
   }
 
-  // 2. Is the structure right?
   const result = validateImportData(data);
   if (!result.valid) {
     const shown = result.errors.slice(0, 3).join(' ');
@@ -804,7 +777,6 @@ importFile.addEventListener('change', async () => {
     return;
   }
 
-  // 3. Ask before replacing the current records
   const count = result.records.length;
   const ok = confirm(
     `Replace your ${getRecords().length} current records with ${count} imported records?`
@@ -815,7 +787,6 @@ importFile.addEventListener('change', async () => {
     return;
   }
 
-  // 4. Load it
   replaceAllRecords(result.records);
   if (result.settings) setSettings(result.settings);
   fillSettingsForm();
@@ -825,7 +796,7 @@ importFile.addEventListener('change', async () => {
 });
 
 
-/* --- reset to sample data --- */
+/*  reset to sample data  */
 resetBtn.addEventListener('click', async () => {
   if (!confirm('Replace all your records and settings with the sample data?')) return;
 
@@ -849,7 +820,7 @@ async function init() {
 
   const saved = loadRecords();
   if (saved === null) {
-    replaceAllRecords(await fetchSeed());   // also saves them
+    replaceAllRecords(await fetchSeed());   
   } else {
     setRecords(saved);
   }

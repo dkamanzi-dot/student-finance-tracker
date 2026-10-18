@@ -64,7 +64,7 @@ export function setRecords(list) {
             updatedAt: now,
         };
         records.push(record);
-        saveRecords(record);
+        saveRecords(records);
         return record;
     }
 
@@ -113,8 +113,7 @@ export function setRecords(list) {
     }
 
     /*  6. Currency  */
-// Amounts are stored in the base currency and only converted when shown.
-// A rate means 1 base unit = N units of that currency.
+
 
 const SYMBOLS = { USD: '$', EUR: '€', GBP: '£', RWF: 'RWF ' };
 
@@ -147,9 +146,7 @@ export function formatMoney(amountBase, settings) {
 }
 
 /*  7. Dashboard stats  */
-// All amounts here are in the BASE currency.
 
-// Avoids float problems like 0.1 + 0.2 = 0.30000000000000004
 function round2(number) {
   return Math.round(number * 100) / 100;
 }
@@ -159,8 +156,6 @@ export function totalAmount(records) {
   return round2(records.reduce((sum, record) => sum + record.amount, 0));
 }
 
-// The category with the highest total spent.
-// Returns { name, total } or null when there are no records.
 export function topCategory(records) {
   if (records.length === 0) return null;
 
@@ -176,16 +171,12 @@ export function topCategory(records) {
   return best;
 }
 
-// Builds "YYYY-MM-DD" from local date parts (not toISOString,
-// which uses UTC and can shift the day).
 function dateKey(date) {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   return `${date.getFullYear()}-${month}-${day}`;
 }
 
-// Returns 7 items, oldest first, ending with today:
-// [{ date: "2026-10-05", label: "Mon", total: 12.5 }, ...]
 export function trendLastSevenDays(records, today = new Date()) {
   const days = [];
 
@@ -206,9 +197,6 @@ export function trendLastSevenDays(records, today = new Date()) {
   return days;
 }
 
-// Returns { state, amount, cap }
-// state is "none" (no cap), "under" (cap not exceeded) or "over".
-// amount is what is remaining (under) or the overage (over).
 export function capStatus(total, cap) {
   if (!cap || cap <= 0) {
     return { state: 'none', amount: 0, cap: 0 };
@@ -222,8 +210,6 @@ export function capStatus(total, cap) {
   return { state: 'over', amount: -difference, cap };
 }
 
-// Builds the sentence. fmt turns a base amount into text,
-// for example (n) => formatMoney(n, settings).
 export function capMessage(status, fmt) {
   if (status.state === 'none') {
     return 'No spending cap set. Add one in Settings.';

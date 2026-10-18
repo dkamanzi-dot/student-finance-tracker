@@ -3,10 +3,10 @@
   --text: #1a1a1a;
   --muted: #595959;
   --bg: #ffffff;
-  --surface: #f2f5f9;
-  --border: #c9d2de;
-  --primary: #0b5cad;
-  --primary-dark: #08457f;
+  --primary: #146c43;
+  --primary-dark: #0d4d30;
+  --surface: #f0f7f3;
+  --border: #c5dccf;
   --error: #b00020;
   --mark: #ffe066;
 
@@ -203,9 +203,13 @@ legend {
 .error {
   min-height: 0;
   margin: 0;
-  color: #7a4b00;
+  color: var(--error);
   font-size: 0.9rem;
 }
+
+.error.warning { color: 7a4b00; }
+
+.error:empty { display: none; }
 
 .hint {
   margin: 0 0 var(--space-3);
@@ -221,6 +225,11 @@ legend {
 .form-status {
   min-height: 1.5rem;
   font-weight: 600;
+}
+
+.field-pair {
+  display: flex;
+  flex-direction: column;
 }
 
 .form-actions {
@@ -334,7 +343,7 @@ legend {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-1)
+  gap: var(--space-1);
   min-width: 0;
 }
 
@@ -413,10 +422,34 @@ mark {
   content: none;
 }
 
+.records-table td.empty {
+  display: block;
+  color: var(--muted);
+  text-align: center;
+}
+.records-table tr.editing {
+  background: #fff8e1;
+  outline: 2px solid var(--primary);
+}
+.records-table tr.editing td {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.records-table tr.editing td.actions {
+  flex-direction: row;
+  align-items: center;
+}
+
 /* ---------- Tablet: 768px ---------- */
 @media (min-width: 768px) {
   .bar-amount { display: block;}
   h1 { font-size: 1.75rem; }
+  .field-pair {
+    flex-direction: row;
+    gap: var(--space-3);
+  }
+  .field-pair .field { flex: 1; }
 
   .site-header {
     flex-direction: row;
@@ -503,6 +536,7 @@ mark {
 
   .stat-value {
     font-size: 2.25rem;
+    overflow-wrap: anywhere;
   }
 
   .chart {

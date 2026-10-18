@@ -46,7 +46,7 @@
     </style>
   </head>
   <body>
-    <h1>Validator tests</h1>
+    <h1>Tests</h1>
     <p id="summary" role="status">Running tests...</p>
     <div id="output"></div>
 
@@ -79,8 +79,9 @@
         formatMoney,
         getRate,
       } from "./scripts/state.js";
+      import { compileRegex, recordMatches } from "./scripts/search.js";
 
-      /* ---------- Tiny test helpers ---------- */
+      /* Tiny test helpers */
       let passed = 0;
       let failed = 0;
       let currentList = null;
@@ -100,7 +101,7 @@
         condition ? passed++ : failed++;
       }
 
-      /* ---------- Description ---------- */
+      /*  Description  */
       group("Description (no leading or trailing spaces)");
       assert(
         '"Lunch at cafeteria" is valid',
@@ -125,7 +126,7 @@
         validateDescription("Bus  pass").valid,
       );
 
-      /* ---------- Amount ---------- */
+      /*  Amount  */
       group("Amount");
       assert('"12.50" is valid', validateAmount("12.50").valid);
       assert('"0" is valid', validateAmount("0").valid);
@@ -141,7 +142,7 @@
       assert('"abc" is invalid', !validateAmount("abc").valid);
       assert('"" (empty) is invalid', !validateAmount("").valid);
 
-      /* ---------- Date ---------- */
+      /*  Date  */
       group("Date (YYYY-MM-DD)");
       assert('"2025-09-29" is valid', validateDate("2025-09-29").valid);
       assert(
@@ -169,7 +170,7 @@
         isRealDate("2025-04-31") === false,
       );
 
-      /* ---------- Category ---------- */
+      /*  Category  */
       group("Category (letters, spaces, hyphens)");
       assert('"Food" is valid', validateCategory("Food").valid);
       assert('"Fast-food" is valid', validateCategory("Fast-food").valid);
@@ -188,7 +189,7 @@
       );
       assert('"" (empty) is invalid', !validateCategory("").valid);
 
-      /* ---------- Advanced: duplicate word ---------- */
+      /*  Advanced: duplicate word  */
       group("Advanced: duplicate word (back-reference)");
       assert(
         '"coffee coffee" gives a warning',
@@ -211,7 +212,7 @@
         validateDescription("coffee coffee").valid,
       );
 
-      /* ---------- Whole record ---------- */
+      /*  Whole record  */
       group("validateRecord");
       const good = validateRecord({
         description: "Bus pass",
@@ -242,7 +243,7 @@
         dup.valid && !!dup.warnings.description,
       );
 
-      /* ---------- Raw patterns ---------- */
+      /*  Raw patterns  */
       group("Raw patterns");
       assert('patterns.amount matches "7.5"', patterns.amount.test("7.5"));
       assert(
@@ -250,7 +251,7 @@
         !patterns.date.test("2025-00-10"),
       );
 
-      /* ---------- Stats and cap ---------- */
+      /*  Stats and cap  */
       group("Stats and cap");
       const sample = [
         { amount: 10, category: "Food", date: "2026-10-11" },
@@ -300,57 +301,131 @@
         capMessage(capStatus(100, 500), (n) => `$${n}`).includes("remaining"),
       );
 
-          /* ---------- Currency code and rate ---------- */
-    group('Currency code and rate (rate uses a lookahead)');
-    assert('"USD" is a valid code', validateCurrencyCode('USD').valid);
-    assert('"usd" (lowercase) is invalid', !validateCurrencyCode('usd').valid);
-    assert('"US" (too short) is invalid', !validateCurrencyCode('US').valid);
-    assert('"0.92" is a valid rate', validateRate('0.92').valid);
-    assert('"1450" is a valid rate', validateRate('1450').valid);
-    assert('"0" is an invalid rate', !validateRate('0').valid);
-    assert('"0.00" is an invalid rate', !validateRate('0.00').valid);
-    assert('"-1" is an invalid rate', !validateRate('-1').valid);
-    assert('"1.1234567" (7 decimals) is an invalid rate', !validateRate('1.1234567').valid);
+      /*  Currency code and rate  */
+      group("Currency code and rate (rate uses a lookahead)");
+      assert('"USD" is a valid code', validateCurrencyCode("USD").valid);
+      assert(
+        '"usd" (lowercase) is invalid',
+        !validateCurrencyCode("usd").valid,
+      );
+      assert('"US" (too short) is invalid', !validateCurrencyCode("US").valid);
+      assert('"0.92" is a valid rate', validateRate("0.92").valid);
+      assert('"1450" is a valid rate', validateRate("1450").valid);
+      assert('"0" is an invalid rate', !validateRate("0").valid);
+      assert('"0.00" is an invalid rate', !validateRate("0.00").valid);
+      assert('"-1" is an invalid rate', !validateRate("-1").valid);
+      assert(
+        '"1.1234567" (7 decimals) is an invalid rate',
+        !validateRate("1.1234567").valid,
+      );
 
-    /* ---------- Categories list ---------- */
-    group('Categories list (Settings)');
-    const cats = validateCategoriesText('Food, Books ,  Fast-food');
-    assert('A good list is valid', cats.valid && cats.list.length === 3);
-    assert('Duplicates are removed (ignoring case)', validateCategoriesText('Food, food, FOOD').list.length === 1);
-    assert('A name with a digit is invalid', !validateCategoriesText('Food, B00ks').valid);
-    assert('An empty list is invalid', !validateCategoriesText(' , ,').valid);
+      /*  Categories list  */
+      group("Categories list (Settings)");
+      const cats = validateCategoriesText("Food, Books ,  Fast-food");
+      assert("A good list is valid", cats.valid && cats.list.length === 3);
+      assert(
+        "Duplicates are removed (ignoring case)",
+        validateCategoriesText("Food, food, FOOD").list.length === 1,
+      );
+      assert(
+        "A name with a digit is invalid",
+        !validateCategoriesText("Food, B00ks").valid,
+      );
+      assert("An empty list is invalid", !validateCategoriesText(" , ,").valid);
 
-    /* ---------- Stored data and import ---------- */
-    group('Stored records and JSON import validation');
-    const rec = { id: 'txn_0001', description: 'Lunch', amount: 12.5, category: 'Food', date: '2025-09-25', createdAt: '2025-09-25T12:00:00.000Z', updatedAt: '2025-09-25T12:00:00.000Z' };
-    assert('A good record has no problems', validateStoredRecord(rec).length === 0);
-    assert('A string amount is rejected', validateStoredRecord({ ...rec, amount: '12.5' }).length > 0);
-    assert('A missing id is rejected', validateStoredRecord({ ...rec, id: '' }).length > 0);
-    assert('A bad date is rejected', validateStoredRecord({ ...rec, date: '2025-02-30' }).length > 0);
-    assert('A bad timestamp is rejected', validateStoredRecord({ ...rec, createdAt: 'yesterday' }).length > 0);
-    assert('A list of records imports', validateImportData([rec]).valid);
-    assert('{ records: [...] } imports', validateImportData({ records: [rec] }).valid);
-    assert('A string is rejected', !validateImportData('hello').valid);
-    assert('An object without records is rejected', !validateImportData({ foo: 1 }).valid);
-    assert('Repeated ids are rejected', !validateImportData([rec, rec]).valid);
-    const good = { baseCurrency: 'USD', currencies: ['USD', 'EUR', 'RWF'], rates: { EUR: 0.92, RWF: 1450 }, displayCurrency: 'USD', cap: 500, categories: ['Food', 'Books'] };
-    assert('Good settings have no problems', validateSettingsObject(good).length === 0);
-    assert('A negative cap is rejected', validateSettingsObject({ ...good, cap: -5 }).length > 0);
-    assert('A missing rate is rejected', validateSettingsObject({ ...good, rates: { EUR: 0.92 } }).length > 0);
+      /*  Stored data and import  */
+      group("Stored records and JSON import validation");
+      const rec = {
+        id: "txn_0001",
+        description: "Lunch",
+        amount: 12.5,
+        category: "Food",
+        date: "2025-09-25",
+        createdAt: "2025-09-25T12:00:00.000Z",
+        updatedAt: "2025-09-25T12:00:00.000Z",
+      };
+      assert(
+        "A good record has no problems",
+        validateStoredRecord(rec).length === 0,
+      );
+      assert(
+        "A string amount is rejected",
+        validateStoredRecord({ ...rec, amount: "12.5" }).length > 0,
+      );
+      assert(
+        "A missing id is rejected",
+        validateStoredRecord({ ...rec, id: "" }).length > 0,
+      );
+      assert(
+        "A bad date is rejected",
+        validateStoredRecord({ ...rec, date: "2025-02-30" }).length > 0,
+      );
+      assert(
+        "A bad timestamp is rejected",
+        validateStoredRecord({ ...rec, createdAt: "yesterday" }).length > 0,
+      );
+      assert("A list of records imports", validateImportData([rec]).valid);
+      assert(
+        "{ records: [...] } imports",
+        validateImportData({ records: [rec] }).valid,
+      );
+      assert("A string is rejected", !validateImportData("hello").valid);
+      assert(
+        "An object without records is rejected",
+        !validateImportData({ foo: 1 }).valid,
+      );
+      assert(
+        "Repeated ids are rejected",
+        !validateImportData([rec, rec]).valid,
+      );
+      const goodSettings = {
+        baseCurrency: "USD",
+        currencies: ["USD", "EUR", "RWF"],
+        rates: { EUR: 0.92, RWF: 1450 },
+        displayCurrency: "USD",
+        cap: 500,
+        categories: ["Food", "Books"],
+      };
+      assert(
+        "Good settings have no problems",
+        validateSettingsObject(goodSettings).length === 0,
+      );
+      assert(
+        "A negative cap is rejected",
+        validateSettingsObject({ ...goodSettings, cap: -5 }).length > 0,
+      );
+      assert(
+        "A missing rate is rejected",
+        validateSettingsObject({ ...goodSettings, rates: { EUR: 0.92 } })
+          .length > 0,
+      );
 
-    /* ---------- Currency conversion ---------- */
-    group('Currency conversion (stored in base, shown in display currency)');
-    const usd = { baseCurrency: 'USD', rates: { EUR: 0.92, RWF: 1450 }, displayCurrency: 'USD' };
-    const eur = { ...usd, displayCurrency: 'EUR' };
-    const rwf = { ...usd, displayCurrency: 'RWF' };
-    assert('Base currency rate is 1', getRate(usd, 'USD') === 1);
-    assert('10 USD is 9.2 EUR', Math.abs(convert(10, eur) - 9.2) < 1e-9);
-    assert('formatMoney shows $12.50', formatMoney(12.5, usd) === '$12.50');
-    assert('formatMoney shows the euro sign', formatMoney(10, eur) === '€9.20');
-    assert('RWF uses the code as prefix', formatMoney(1, rwf) === 'RWF 1450.00');
-    assert('displayNumber has no symbol', displayNumber(12.5, usd) === '12.50');
+      /*  Currency conversion  */
+      group("Currency conversion (stored in base, shown in display currency)");
+      const usd = {
+        baseCurrency: "USD",
+        rates: { EUR: 0.92, RWF: 1450 },
+        displayCurrency: "USD",
+      };
+      const eur = { ...usd, displayCurrency: "EUR" };
+      const rwf = { ...usd, displayCurrency: "RWF" };
+      assert("Base currency rate is 1", getRate(usd, "USD") === 1);
+      assert("10 USD is 9.2 EUR", Math.abs(convert(10, eur) - 9.2) < 1e-9);
+      assert("formatMoney shows $12.50", formatMoney(12.5, usd) === "$12.50");
+      assert(
+        "formatMoney shows the euro sign",
+        formatMoney(10, eur) === "€9.20",
+      );
+      assert(
+        "RWF uses the code as prefix",
+        formatMoney(1, rwf) === "RWF 1450.00",
+      );
+      assert(
+        "displayNumber has no symbol",
+        displayNumber(12.5, usd) === "12.50",
+      );
 
-      /* ---------- Summary ---------- */
+      /*  Summary  */
       const summary = document.querySelector("#summary");
       summary.textContent = `${passed} passed, ${failed} failed`;
       summary.style.color = failed === 0 ? "#14532d" : "#b00020";

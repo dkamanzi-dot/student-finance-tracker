@@ -1,16 +1,15 @@
-Student Finance Tracker: Spec (M1)
-
-Student Finance Tracker is a vanilla HTML, CSS and JavaScript app where a student logs spending, searches it with regex and stays under a spending cap. It is deployed on GitHub Pages and saves everything in localStorage.
+Student Finance Tracker:Spec(M1)
+Student Finance Tracker is a vanilla HTML,CSS and JavaScript app where a student logs spending, searches it with regex and stays under a spending cap. It is deployed on GitHub Pages and saves everything in localStorage.
 
 1. Purpose and pages
-
 The app helps a student see where money goes, find transactions fast, and stay under a cap. It is a single-page app with five sections reached from one nav bar.
+. About: purpose of the app and contact details(GitHub,email).
+. Dashboard: total records, total spend, top category, last-7-days chart, and the cap message(remaining or overage).
+. Records: all transactions as a table on desktop and cards on mobile. The user can sort,regex-search,edit inline and delete with confirmation
+. Add/Edit Form: description,amount,category and date fields with inline error messages.
+. Settings: base currency,two other currencies,manual exchange rates,spending cap,editable categories, and JSON import/export.
 
-About: purpose of the app and contact details (GitHub, email).
-Dashboard: total records, total spent, top category, last-7-days chart, and the cap message (remaining or overage).
-Records: all transactions as a table on desktop and cards on mobile. The user can sort, regex-search, edit inline and delete with confirmation.
-Add/Edit Form: description, amount, category and date fields with inline error messages.
-Settings: base currency, two other currencies, manual exchange rates, spending cap, editable categories, and JSON import/export.
+
 2. Data model
 
 Every amount is stored in the base currency and converted only for display. Records and settings are stored under separate localStorage keys.

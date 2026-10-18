@@ -124,5 +124,33 @@
     "date": "2025-11-15",
     "createdAt": "2025-11-15T12:00:00.000Z",
     "updatedAt": "2025-11-15T12:00:00.000Z"
-  }
+  },
+  {
+    "id": "txn_00015",
+    "description": "Monthly rent",
+    "amount": 450,
+    "category": "Housing",
+    "date": "2026-10-01",
+    "createdAt": "2026-10-01T12:00:00.000Z",
+    "updatedAt": "2026-10-01T12:00:00.000Z"
+  },
+  {
+    "id": "txn_0016",
+    "description": "Electricity bill",
+    "amount": 35.75,
+    "category": "Utilities",
+    "date": "2026-10-02",
+    "createdAt": "2026-10-02T12:00:00.000Z",
+    "updatedAt": "2026-10-02T12:00:00.000z"
+    },
+    {
+      "id": "txn_0017",
+      "description": "Monthly internet subscription",
+      "amount": 25,
+      "category": "Utilities",
+      "date":"2026-10-03",
+      "createdAt": "2026-10-03T12:00:00.000Z",
+      "updatedAt": "2026-10-03T12:00:00.000Z"
+    }
+
 ]
